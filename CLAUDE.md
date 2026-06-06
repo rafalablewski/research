@@ -26,9 +26,12 @@ npm run dev        # dev server (http://localhost:3000)
 npm run build      # production build (also typechecks + lints)
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
+npm test           # vitest run (unit tests for lib/ logic)
+npm run test:watch # vitest watch mode
 ```
 
-There is **no test suite** configured yet. `npm run typecheck` is the closest gate.
+Tests cover the pure modules (`lib/portfolio.ts`, `lib/format.ts`, `lib/snowflake.ts`).
+Add tests alongside new pure logic; UI is currently validated via build + typecheck.
 
 ## Conventions
 
@@ -68,7 +71,7 @@ There is **no test suite** configured yet. `npm run typecheck` is the closest ga
 | Crypto live provider (CoinGecko) | ✅ wired, mock fallback |
 | Stock live provider (FMP) | ✅ wired (needs `FMP_API_KEY`), mock fallback |
 | Live data in screener / dashboard movers / watchlist | ✅ via `useMarketAssets` |
-| Tests | ⛔ none configured |
+| Tests | ✅ Vitest — 12 unit tests over `lib/` (portfolio, format, snowflake) |
 
 ## Enforcement (optional)
 
@@ -84,6 +87,9 @@ Not installed yet — ask the user before adding.
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add Vitest + 12 unit tests** for the pure engine/helpers (`lib/portfolio.ts`
+  average-cost accounting & value series, `lib/format.ts`, `lib/snowflake.ts`). Added
+  `npm test` / `npm run test:watch` scripts and `vitest.config.ts` (`@/` alias).
 - **Surface live data in dashboard Market Movers and Watchlist** by sourcing them from
   `useMarketAssets` instead of static mock imports.
 - **Wire FMP live stock provider** (`lib/api/fmp.ts`, `app/api/stocks[/:symbol]`),

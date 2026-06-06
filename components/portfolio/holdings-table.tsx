@@ -5,8 +5,8 @@ import type { Holding } from "@/types";
 import { AssetLogo } from "@/components/shared/asset-logo";
 import { ChangeBadge } from "@/components/shared/change-badge";
 import { Sparkline } from "@/components/charts/sparkline";
-import { formatCurrency, formatCompactCurrency, formatPercent, formatNumber } from "@/lib/format";
-import { changeColor } from "@/lib/format";
+import { formatPercent, formatNumber, changeColor } from "@/lib/format";
+import { useMoney } from "@/hooks/use-fx";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
  * columns; the full version (portfolio page) shows quantity, cost basis, weight.
  */
 export function HoldingsTable({ holdings, compact = false }: { holdings: Holding[]; compact?: boolean }) {
+  const money = useMoney();
   return (
     <div className="overflow-x-auto scrollbar-thin">
       <table className="w-full min-w-[520px] text-sm">
@@ -45,17 +46,17 @@ export function HoldingsTable({ holdings, compact = false }: { holdings: Holding
                   {formatNumber(h.quantity, h.quantity < 10 ? 4 : 2)}
                 </td>
               )}
-              <td className="px-3 py-2.5 text-right tabular">{formatCurrency(h.asset.price)}</td>
+              <td className="px-3 py-2.5 text-right tabular">{money.price(h.asset.price)}</td>
               <td className="hidden px-3 py-2.5 text-right sm:table-cell">
                 <div className="flex items-center justify-end gap-2">
                   <Sparkline data={h.asset.history} positive={h.asset.change7d >= 0} width={64} height={28} />
                   <ChangeBadge value={h.asset.change7d} showIcon={false} />
                 </div>
               </td>
-              <td className="px-3 py-2.5 text-right font-medium tabular">{formatCompactCurrency(h.marketValue)}</td>
+              <td className="px-3 py-2.5 text-right font-medium tabular">{money.compact(h.marketValue)}</td>
               <td className="px-3 py-2.5 text-right">
                 <div className={cn("font-medium tabular", changeColor(h.unrealizedPL))}>
-                  {formatCompactCurrency(h.unrealizedPL)}
+                  {money.compact(h.unrealizedPL)}
                 </div>
                 <div className={cn("text-xs tabular", changeColor(h.unrealizedPLPercent))}>
                   {formatPercent(h.unrealizedPLPercent)}

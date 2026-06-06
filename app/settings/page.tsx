@@ -93,8 +93,9 @@ export default function SettingsPage() {
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
-            Stored preference. Live FX conversion plugs in at a <code className="rounded bg-muted px-1">lib/api/fx</code>
-            {" "}seam; values are currently shown in USD.
+            Converts USD amounts across the dashboard, holdings and asset pages using rates
+            from <code className="rounded bg-muted px-1">/api/fx</code> (live when the FX host is
+            reachable, static fallback otherwise). Charts remain in USD.
           </p>
         </CardContent>
       </Card>

@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { AssetLogo } from "@/components/shared/asset-logo";
 import { ChangeBadge } from "@/components/shared/change-badge";
 import { ScorePill } from "@/components/shared/score-pill";
-import { formatPrice, formatCompactCurrency } from "@/lib/format";
+import { formatCompactCurrency } from "@/lib/format";
+import { useMoney } from "@/hooks/use-fx";
 import { overallScore } from "@/lib/snowflake";
 import { useWatchlistStore } from "@/stores/watchlist-store";
 import { cn } from "@/lib/utils";
@@ -17,10 +18,11 @@ export function AssetHeader({ asset, onAddTransaction }: { asset: Asset; onAddTr
   const symbols = useWatchlistStore((s) => s.symbols);
   const toggle = useWatchlistStore((s) => s.toggle);
   const watched = symbols.includes(asset.symbol);
+  const money = useMoney();
 
   const stats: { label: string; value: string }[] = [
-    { label: "Market Cap", value: formatCompactCurrency(asset.marketCap) },
-    { label: "24h Volume", value: formatCompactCurrency(asset.volume24h) },
+    { label: "Market Cap", value: money.compact(asset.marketCap) },
+    { label: "24h Volume", value: money.compact(asset.volume24h) },
     asset.assetClass === "stock"
       ? { label: "P/E Ratio", value: asset.peRatio ? asset.peRatio.toFixed(1) : "—" }
       : { label: "Circ. Supply", value: asset.circulatingSupply ? formatCompactCurrency(asset.circulatingSupply).replace("$", "") : "—" },
@@ -49,7 +51,7 @@ export function AssetHeader({ asset, onAddTransaction }: { asset: Asset; onAddTr
               )}
             </div>
             <div className="mt-1.5 flex items-baseline gap-3">
-              <span className="text-3xl font-bold tabular">{formatPrice(asset.price)}</span>
+              <span className="text-3xl font-bold tabular">{money.price(asset.price)}</span>
               <ChangeBadge value={asset.change24h} size="md" />
               <span className="text-sm text-muted-foreground">today</span>
             </div>

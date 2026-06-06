@@ -103,6 +103,10 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Wire FX display-currency conversion** (`lib/api/fx.ts`, `app/api/fx`, `hooks/use-fx.ts`):
+  `useMoney()` converts USD→selected currency (live rates via open.er-api.com, static
+  fallback) and is wired into the dashboard overview cards, holdings table and asset
+  header. Settings currency selector now actually converts. Charts remain USD.
 - **Add standalone HTML preview** (`preview/strata-preview.html`): a build-free,
   single-file mock of the dashboard (CDN Tailwind + Chart.js, inline mock data) with
   working light/dark + brand-theme toggles, for quickly showing the UI without `npm`.

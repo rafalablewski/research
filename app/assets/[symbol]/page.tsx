@@ -18,7 +18,9 @@ import {
 } from "@/components/asset/sections";
 import { SnowflakeCard } from "@/components/dashboard/snowflake-card";
 import { PriceChart } from "@/components/charts/price-chart";
+import { ComparisonChart } from "@/components/charts/comparison-chart";
 import { FinancialsChart } from "@/components/charts/financials-chart";
+import { useSimilarAssets } from "@/hooks/use-assets";
 import { NewsCard } from "@/components/dashboard/news-card";
 import { AddTransactionDialog } from "@/components/portfolio/add-transaction-dialog";
 
@@ -26,6 +28,7 @@ import { AddTransactionDialog } from "@/components/portfolio/add-transaction-dia
 export default function AssetPage({ params }: { params: Promise<{ symbol: string }> }) {
   const { symbol } = use(params);
   const { data: asset, isLoading } = useAsset(symbol);
+  const { data: similar = [] } = useSimilarAssets(asset);
   const [txOpen, setTxOpen] = useState(false);
 
   if (isLoading) return <AssetSkeleton />;
@@ -96,7 +99,7 @@ export default function AssetPage({ params }: { params: Promise<{ symbol: string
         </TabsContent>
 
         {/* ── Charts ── */}
-        <TabsContent value="charts">
+        <TabsContent value="charts" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Price & Volume</CardTitle>
@@ -106,6 +109,18 @@ export default function AssetPage({ params }: { params: Promise<{ symbol: string
               <PriceChart history={asset.history} defaultRange="6M" />
             </CardContent>
           </Card>
+
+          {similar.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Comparison</CardTitle>
+                <CardDescription>Rebased to 0% — toggle peers to compare relative returns</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ComparisonChart base={asset} candidates={similar} />
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* ── News ── */}

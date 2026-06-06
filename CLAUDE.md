@@ -96,6 +96,9 @@ outside Claude sessions.
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add multi-asset performance comparison chart** (`components/charts/comparison-chart.tsx`)
+  on the asset Charts tab: rebases each series to 0% over a selectable range and lets the
+  user toggle peer assets (sourced from `useSimilarAssets`) to compare relative returns.
 - **Add changelog-enforcement hook** (`.claude/hooks/require-changelog.sh`, `PreToolUse`
   in `.claude/settings.json`): blocks `git commit` when code is staged without `CLAUDE.md`,
   making the changelog rule self-enforcing. Tested for ignore/block/allow paths.

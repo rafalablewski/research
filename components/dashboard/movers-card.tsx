@@ -6,15 +6,17 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AssetLogo } from "@/components/shared/asset-logo";
 import { ChangeBadge } from "@/components/shared/change-badge";
+import type { Asset } from "@/types";
 import { formatPrice } from "@/lib/format";
-import { ALL_ASSETS } from "@/data";
+import { useMarketAssets } from "@/hooks/use-assets";
 
 /** Top gainers and losers across the universe (by 24h change). */
 export function MoversCard() {
+  const { data: market } = useMarketAssets();
   const { gainers, losers } = useMemo(() => {
-    const sorted = [...ALL_ASSETS].sort((a, b) => b.change24h - a.change24h);
+    const sorted = [...market.assets].sort((a, b) => b.change24h - a.change24h);
     return { gainers: sorted.slice(0, 4), losers: sorted.slice(-4).reverse() };
-  }, []);
+  }, [market.assets]);
 
   return (
     <Card>
@@ -36,7 +38,7 @@ function MoverColumn({
 }: {
   title: string;
   icon: React.ReactNode;
-  assets: typeof ALL_ASSETS;
+  assets: Asset[];
 }) {
   return (
     <div>

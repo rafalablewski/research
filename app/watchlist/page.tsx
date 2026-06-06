@@ -7,14 +7,14 @@ import { PageHeader } from "@/components/shared/page-header";
 import { ScreenerTable } from "@/components/discovery/screener-table";
 import { Button } from "@/components/ui/button";
 import { useWatchlistStore } from "@/stores/watchlist-store";
-import { getAssetBySymbol } from "@/data";
-import type { Asset } from "@/types";
+import { useMarketAssets } from "@/hooks/use-assets";
 
 export default function WatchlistPage() {
   const symbols = useWatchlistStore((s) => s.symbols);
+  const { data: market } = useMarketAssets();
   const assets = useMemo(
-    () => symbols.map((s) => getAssetBySymbol(s)).filter(Boolean) as Asset[],
-    [symbols],
+    () => market.assets.filter((a) => symbols.includes(a.symbol)),
+    [market.assets, symbols],
   );
 
   return (

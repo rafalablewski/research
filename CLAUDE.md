@@ -67,8 +67,7 @@ There is **no test suite** configured yet. `npm run typecheck` is the closest ga
 | App (dashboard, portfolio, screener, ideas, watchlist, asset pages) | ✅ built |
 | Crypto live provider (CoinGecko) | ✅ wired, mock fallback |
 | Stock live provider (FMP) | ✅ wired (needs `FMP_API_KEY`), mock fallback |
-| Live data in screener | ✅ via `useMarketAssets` (shows a "Live" badge) |
-| Live data in dashboard movers / watchlist lists | ⛔ still static mock |
+| Live data in screener / dashboard movers / watchlist | ✅ via `useMarketAssets` |
 | Tests | ⛔ none configured |
 
 ## Enforcement (optional)
@@ -85,6 +84,8 @@ Not installed yet — ask the user before adding.
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Surface live data in dashboard Market Movers and Watchlist** by sourcing them from
+  `useMarketAssets` instead of static mock imports.
 - **Wire FMP live stock provider** (`lib/api/fmp.ts`, `app/api/stocks[/:symbol]`),
   symmetric to CoinGecko; needs `FMP_API_KEY`, mock fallback. `useAsset` now routes
   stocks→FMP and crypto→CoinGecko. Generalized the live badge to show the provider.

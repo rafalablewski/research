@@ -1,4 +1,4 @@
-import type { Asset } from "@/types";
+import type { Asset, PricePoint } from "@/types";
 import { STOCKS } from "@/data/stocks";
 
 /**
@@ -52,10 +52,48 @@ export async function fetchLiveStocks(symbols?: string[]): Promise<Asset[]> {
   });
 }
 
-/** Fetch a single live stock by symbol; throws on failure. */
+/**
+ * Fetch a single live stock by symbol, including real daily OHLC history.
+ * Throws on quote failure; history failure degrades to curated mock history.
+ */
 export async function fetchLiveStock(symbol: string): Promise<Asset | undefined> {
   const [asset] = await fetchLiveStocks([symbol]);
+  if (!asset) return undefined;
+  try {
+    const history = await fetchStockHistory(symbol);
+    if (history.length) return { ...asset, history };
+  } catch {
+    /* keep curated mock history */
+  }
   return asset;
+}
+
+/** Live daily OHLC (true open/high/low/close/volume) from FMP. */
+export async function fetchStockHistory(symbol: string, days = 365): Promise<PricePoint[]> {
+  const key = process.env.FMP_API_KEY;
+  if (!key) throw new Error("FMP_API_KEY not set");
+
+  const res = await fetch(
+    `${API_BASE}/historical-price-full/${symbol.toUpperCase()}?timeseries=${days}&apikey=${key}`,
+    { next: { revalidate: 3600 } },
+  );
+  if (!res.ok) throw new Error(`FMP history ${res.status}`);
+
+  const json = (await res.json()) as {
+    historical?: { date: string; open: number; high: number; low: number; close: number; volume: number }[];
+  };
+  const rows = json.historical ?? [];
+  // FMP returns newest-first; the charts expect oldest-first.
+  return rows
+    .map((d) => ({
+      date: d.date,
+      open: d.open,
+      high: d.high,
+      low: d.low,
+      close: d.close,
+      volume: d.volume,
+    }))
+    .reverse();
 }
 
 function mergeQuote(mock: Asset, q: FmpQuote): Asset {

@@ -1,4 +1,4 @@
-import type { Asset } from "@/types";
+import type { Asset, PricePoint } from "@/types";
 import { CRYPTOS } from "@/data/cryptos";
 
 /**
@@ -87,10 +87,65 @@ export async function fetchLiveCryptos(symbols?: string[]): Promise<Asset[]> {
   });
 }
 
-/** Fetch a single live crypto by symbol; throws on failure. */
+/**
+ * Fetch a single live crypto by symbol, including live daily history for the
+ * charts. Throws on quote failure; history failure degrades to mock history.
+ */
 export async function fetchLiveCrypto(symbol: string): Promise<Asset | undefined> {
   const [asset] = await fetchLiveCryptos([symbol]);
+  if (!asset) return undefined;
+  try {
+    const history = await fetchCryptoHistory(symbol);
+    if (history.length) return { ...asset, history };
+  } catch {
+    /* keep curated mock history */
+  }
   return asset;
+}
+
+/**
+ * Live daily OHLC for the charts. CoinGecko's free market_chart returns daily
+ * closes + volumes; intraday O/H/L aren't available there, so we synthesize a
+ * candle around each close (open = previous close, small wicks) — good enough
+ * for the area chart and a representative candlestick. Swap for the `/ohlc`
+ * endpoint (or a Pro plan) if true intraday candles are needed.
+ */
+export async function fetchCryptoHistory(symbol: string, days = 365): Promise<PricePoint[]> {
+  const id = COINGECKO_IDS[symbol.toUpperCase()];
+  if (!id) return [];
+
+  const url = `${API_BASE}/coins/${id}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+  const res = await fetch(url, {
+    headers: process.env.COINGECKO_API_KEY ? { "x-cg-pro-api-key": process.env.COINGECKO_API_KEY } : {},
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`CoinGecko history ${res.status}`);
+
+  const json = (await res.json()) as { prices: [number, number][]; total_volumes: [number, number][] };
+  const vols = new Map(json.total_volumes.map(([t, v]) => [dayKey(t), v]));
+
+  return json.prices.map(([t, close], i, arr) => {
+    const open = i > 0 ? arr[i - 1][1] : close;
+    const hi = Math.max(open, close);
+    const lo = Math.min(open, close);
+    return {
+      date: dayKey(t),
+      open: r(open),
+      high: r(hi * 1.01),
+      low: r(lo * 0.99),
+      close: r(close),
+      volume: Math.round(vols.get(dayKey(t)) ?? 0),
+    };
+  });
+}
+
+function dayKey(ts: number) {
+  return new Date(ts).toISOString().slice(0, 10);
+}
+function r(n: number) {
+  if (n >= 1) return Math.round(n * 100) / 100;
+  if (n >= 0.01) return Math.round(n * 10000) / 10000;
+  return Math.round(n * 1e8) / 1e8;
 }
 
 /** Overlay CoinGecko quote fields onto a curated mock asset. */

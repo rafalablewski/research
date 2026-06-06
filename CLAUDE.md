@@ -98,6 +98,10 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Live OHLC history for charts**: `fetchCryptoHistory` (CoinGecko market_chart,
+  synthesized candles) and `fetchStockHistory` (FMP historical-price-full, true OHLC).
+  Single-asset routes now return live `history` for the price/candlestick/comparison
+  charts, degrading to curated mock history on failure.
 - **Add git-native `pre-commit` hook** (`.githooks/pre-commit`) enforcing the changelog
   rule for all commits (not just Claude's). SessionStart hook now runs
   `git config core.hooksPath .githooks` to auto-activate it in web sessions.

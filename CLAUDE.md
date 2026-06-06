@@ -26,12 +26,17 @@ npm run dev        # dev server (http://localhost:3000)
 npm run build      # production build (also typechecks + lints)
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
-npm test           # vitest run (unit tests for lib/ logic)
+npm test           # vitest run (unit + component tests)
 npm run test:watch # vitest watch mode
+npm run e2e        # playwright E2E (needs browsers: npm run e2e:install)
 ```
 
-Tests cover the pure modules (`lib/portfolio.ts`, `lib/format.ts`, `lib/snowflake.ts`).
-Add tests alongside new pure logic; UI is currently validated via build + typecheck.
+- **Unit/component tests (Vitest):** pure logic (`lib/portfolio|format|snowflake`) in the
+  node env; presentational components (`components/shared/*.test.tsx`) opt into jsdom via
+  `// @vitest-environment jsdom`. 17 tests.
+- **E2E (Playwright):** `e2e/*.spec.ts` smoke-tests the main routes + ⌘K palette. Needs
+  browser binaries — blocked under the dev allowlist (Playwright CDN), so run where the
+  CDN is reachable.
 
 ## Conventions
 
@@ -76,7 +81,7 @@ Add tests alongside new pure logic; UI is currently validated via build + typech
 | Crypto live provider (CoinGecko) | ✅ wired, mock fallback |
 | Stock live provider (FMP) | ✅ wired (needs `FMP_API_KEY`), mock fallback |
 | Live data in screener / dashboard movers / watchlist | ✅ via `useMarketAssets` |
-| Tests | ✅ Vitest — 12 unit tests over `lib/` (portfolio, format, snowflake) |
+| Tests | ✅ Vitest — 17 unit+component tests; Playwright E2E smoke specs (need browsers) |
 
 ## Enforcement
 
@@ -98,6 +103,10 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add component tests + Playwright E2E**: 5 jsdom component tests (ScorePill, ChangeBadge,
+  MetricCard, SnowflakeBreakdown) via Testing Library (Vitest now has `@vitejs/plugin-react`
+  + jsdom setup, 17 tests total); Playwright config + `e2e/smoke.spec.ts` covering the main
+  routes and the ⌘K palette (`npm run e2e` / `e2e:install`).
 - **Add Settings page** (`/settings`): appearance (mode + brand swatches), display-currency
   preference (`ui-store.currency`, FX conversion documented as a seam), and a live
   **Data Source Status** panel that probes `/api/stocks` + `/api/crypto` and reports

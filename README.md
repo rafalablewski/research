@@ -52,7 +52,14 @@ npm run build      # production build
 npm run start      # serve the production build
 npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
+npm test           # vitest (unit + component tests)
+npm run e2e        # playwright E2E (run `npm run e2e:install` first)
 ```
+
+**Testing:** pure logic and presentational components are covered by **Vitest**
+(`lib/*.test.ts`, `components/**/*.test.tsx`). End-to-end smoke tests of the main
+routes live in `e2e/` and run on **Playwright** — install browsers with
+`npm run e2e:install` (needs the Playwright CDN reachable).
 
 Requires **Node 18.18+** (developed on Node 22).
 

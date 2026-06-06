@@ -89,6 +89,9 @@ export interface Asset {
   financials?: FinancialYear[];
   history: PricePoint[]; // ~1y of daily candles
   tags: string[]; // for "Investment Ideas" curation
+
+  /** Origin of the quote fields: set to "coingecko" when overlaid with live data. */
+  dataSource?: "coingecko" | "mock";
 }
 
 /** A buy or sell event in a portfolio. */

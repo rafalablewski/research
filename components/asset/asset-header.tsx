@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, Plus } from "lucide-react";
+import { Star, Plus, Radio } from "lucide-react";
 import type { Asset } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +42,11 @@ export function AssetHeader({ asset, onAddTransaction }: { asset: Asset; onAddTr
               <Badge variant="outline" className="hidden sm:inline-flex">
                 {asset.assetClass === "stock" ? asset.exchange : asset.sector}
               </Badge>
+              {asset.dataSource === "coingecko" && (
+                <Badge variant="bull" className="gap-1">
+                  <Radio className="h-3 w-3" /> Live · CoinGecko
+                </Badge>
+              )}
             </div>
             <div className="mt-1.5 flex items-baseline gap-3">
               <span className="text-3xl font-bold tabular">{formatPrice(asset.price)}</span>

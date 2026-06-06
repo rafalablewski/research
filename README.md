@@ -131,7 +131,46 @@ because they reference the same CSS variables.
 
 ---
 
-## 🔌 Plugging in Real Market Data
+## 🔴 Live Data — CoinGecko (implemented)
+
+Crypto is **already wired to a live provider**. The flow:
+
+```
+useAsset(symbol) ─┐                         ┌─ lib/api/coingecko.ts ── api.coingecko.com
+useCryptoMarkets()├─▶ /api/crypto[/:symbol] ┤   (overlays live quotes on curated assets)
+                  │     (route handlers)    └─ falls back to mock on any failure
+```
+
+- **`lib/api/coingecko.ts`** maps our symbols → CoinGecko ids and overlays live
+  `price`, `marketCap`, `volume24h`, supply and 24h/7d/1y changes onto the curated
+  mock assets (Snowflake scores, rewards/risks, OHLC history are preserved).
+- **`app/api/crypto/route.ts`** and **`app/api/crypto/[symbol]/route.ts`** call the
+  provider server-side and return `{ source: "coingecko" | "mock", … }`. Any
+  upstream failure transparently falls back to mock data, so the app never breaks.
+- The asset page shows a **“Live · CoinGecko”** badge when `dataSource === "coingecko"`.
+
+**Endpoints**
+
+```bash
+GET /api/crypto            # { source, assets[] }
+GET /api/crypto/BTC        # { source, asset }
+```
+
+**Enabling live data**
+
+- No API key needed for CoinGecko's public API. For higher limits set
+  `COINGECKO_API_KEY` (used as `x-cg-pro-api-key`, switches to the Pro base URL).
+- In **Claude Code on the web**, the environment's network policy must allowlist
+  `api.coingecko.com`. If it isn't (the default dev allowlist only permits npm +
+  GitHub), the route handlers serve mock data and `source` reports `"mock"` — by
+  design. Choose a broader network policy or add the host to go live.
+
+Stocks follow the **same pattern** — drop in `lib/api/<provider>.ts` + an
+`app/api/stocks/[symbol]/route.ts` and point `useAsset` at it (see below).
+
+---
+
+## 🔌 Plugging in Other Providers
 
 The app is **mock-first** but structured so going live touches only the data layer.
 

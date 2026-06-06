@@ -47,11 +47,43 @@ export function useAssetsByClass(assetClass: "stock" | "crypto" | "all") {
 }
 
 export function useAsset(symbol: string) {
+  const base = getAssetBySymbol(symbol);
   return useQuery<Asset | undefined>({
     queryKey: ["asset", symbol.toUpperCase()],
-    queryFn: () => wait(getAssetBySymbol(symbol)),
+    // Crypto fetches live CoinGecko quotes via our route handler (with built-in
+    // mock fallback); stocks resolve from mock until a stock provider is wired.
+    queryFn: async () => {
+      if (base?.assetClass === "crypto") {
+        try {
+          const res = await fetch(`/api/crypto/${symbol}`);
+          if (res.ok) {
+            const json = (await res.json()) as { asset: Asset };
+            return json.asset;
+          }
+        } catch {
+          /* fall through to mock */
+        }
+      }
+      return wait(base);
+    },
     staleTime: 60_000,
-    initialData: getAssetBySymbol(symbol),
+    initialData: base,
+  });
+}
+
+/**
+ * Live crypto markets list (CoinGecko via /api/crypto, mock fallback).
+ * Use this in lists/screeners to surface live quotes; `source` reflects origin.
+ */
+export function useCryptoMarkets() {
+  return useQuery<{ source: "coingecko" | "mock"; assets: Asset[] }>({
+    queryKey: ["crypto", "markets"],
+    queryFn: async () => {
+      const res = await fetch("/api/crypto");
+      if (!res.ok) throw new Error("crypto markets request failed");
+      return res.json();
+    },
+    staleTime: 60_000,
   });
 }
 

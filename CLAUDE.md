@@ -8,8 +8,8 @@ Guidance for any Claude session working in this repo. Read this first.
 > describing what changed and why. Keep the [Operating Notes](#operating-notes) and
 > [Status](#status) sections current when they're affected. Treat this as part of
 > "done" — a code change without a Changelog entry is incomplete.
-> _(This is a convention enforced by Claude, not the harness. For hard enforcement,
-> add a git `pre-commit` or Claude `Stop` hook — see “Enforcement” below.)_
+> _(Hard-enforced: a Claude `PreToolUse` hook blocks `git commit` when code is
+> staged without `CLAUDE.md`. See [Enforcement](#enforcement).)_
 
 ---
 
@@ -62,6 +62,11 @@ Add tests alongside new pure logic; UI is currently validated via build + typech
 - **SessionStart hook:** `.claude/hooks/session-start.sh` runs `npm install` on session
   start (remote only, synchronous) so lint/typecheck/build are ready immediately.
   Registered in `.claude/settings.json`. Active for all sessions once merged to default.
+- **Changelog-enforcement hook:** `.claude/hooks/require-changelog.sh` is a `PreToolUse`
+  (Bash) hook that blocks any `git commit` where files are staged but `CLAUDE.md` is not —
+  making the changelog rule self-enforcing within Claude sessions. It no-ops on
+  non-commit commands and on empty staging. (Commits made outside Claude aren't covered;
+  add a git-native `pre-commit` hook if you want that too.)
 
 ## Status
 
@@ -73,12 +78,16 @@ Add tests alongside new pure logic; UI is currently validated via build + typech
 | Live data in screener / dashboard movers / watchlist | ✅ via `useMarketAssets` |
 | Tests | ✅ Vitest — 12 unit tests over `lib/` (portfolio, format, snowflake) |
 
-## Enforcement (optional)
+## Enforcement
 
-To make the Changelog rule self-enforcing instead of convention-based, add either:
-- a git `pre-commit` hook that fails if `CLAUDE.md` isn't staged alongside code changes, or
-- a Claude `Stop` hook in `.claude/settings.json` that reminds/append-checks before ending a turn.
-Not installed yet — ask the user before adding.
+The Changelog rule is **self-enforcing** via a Claude `PreToolUse` hook
+(`.claude/hooks/require-changelog.sh`, registered in `.claude/settings.json`): it blocks
+`git commit` when changes are staged but `CLAUDE.md` is not. Validated to (a) ignore
+non-commit Bash commands, (b) block commits missing `CLAUDE.md` (exit 2), (c) allow when
+`CLAUDE.md` is staged or nothing is staged.
+
+Not yet added (optional): a **git-native** `pre-commit` hook to also cover commits made
+outside Claude sessions.
 
 ---
 
@@ -87,6 +96,9 @@ Not installed yet — ask the user before adding.
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add changelog-enforcement hook** (`.claude/hooks/require-changelog.sh`, `PreToolUse`
+  in `.claude/settings.json`): blocks `git commit` when code is staged without `CLAUDE.md`,
+  making the changelog rule self-enforcing. Tested for ignore/block/allow paths.
 - **Add Vitest + 12 unit tests** for the pure engine/helpers (`lib/portfolio.ts`
   average-cost accounting & value series, `lib/format.ts`, `lib/snowflake.ts`). Added
   `npm test` / `npm run test:watch` scripts and `vitest.config.ts` (`@/` alias).

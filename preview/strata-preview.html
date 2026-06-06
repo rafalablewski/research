@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en" class="dark" data-brand="default">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strata — Investment Research (static preview)</title>
+  <!--
+    Standalone, build-free preview of the Strata UI.
+    Open this file directly in a browser. It uses CDN Tailwind + Chart.js and
+    inline mock data to mirror the real Next.js app's look & feel (dashboard).
+    The real app lives in /app, /components, etc.
+  -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            background: "hsl(var(--bg))",
+            card: "hsl(var(--card))",
+            border: "hsl(var(--border))",
+            primary: "hsl(var(--primary))",
+            muted: "hsl(var(--muted))",
+            mutedfg: "hsl(var(--muted-fg))",
+            fg: "hsl(var(--fg))",
+            bull: "hsl(var(--bull))",
+            bear: "hsl(var(--bear))",
+          },
+          borderRadius: { xl: "0.85rem" },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root {
+      --bg: 0 0% 100%; --fg: 222 47% 11%; --card: 0 0% 100%; --muted: 210 40% 96%;
+      --muted-fg: 215 16% 47%; --border: 214 32% 91%; --primary: 221 83% 53%;
+      --bull: 142 71% 45%; --bear: 0 72% 51%;
+    }
+    .dark {
+      --bg: 222 47% 7%; --fg: 210 40% 98%; --card: 222 44% 10%; --muted: 217 33% 15%;
+      --muted-fg: 215 20% 65%; --border: 217 33% 18%; --primary: 217 91% 60%;
+      --bull: 142 69% 50%; --bear: 0 72% 60%;
+    }
+    [data-brand="ocean"] { --primary: 187 92% 42%; }
+    .dark[data-brand="ocean"] { --primary: 186 86% 52%; --bg: 200 60% 6%; --card: 200 50% 9%; --border: 200 40% 16%; }
+    [data-brand="violet"] { --primary: 262 83% 58%; }
+    .dark[data-brand="violet"] { --primary: 263 90% 66%; --bg: 263 40% 7%; --card: 263 35% 11%; --border: 263 30% 19%; }
+    body { background: hsl(var(--bg)); color: hsl(var(--fg)); font-variant-numeric: tabular-nums; }
+    * { border-color: hsl(var(--border)); }
+    .tnum { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="hidden w-60 shrink-0 flex-col border-r bg-[hsl(var(--card))]/40 lg:flex">
+      <div class="flex h-16 items-center gap-2 px-4">
+        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow">▦</span>
+        <div class="leading-tight">
+          <div class="font-bold">Strata</div>
+          <div class="text-[10px] uppercase tracking-wider text-mutedfg">Research</div>
+        </div>
+      </div>
+      <nav class="flex-1 space-y-1 px-3 py-2 text-sm">
+        <a class="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2 font-medium text-primary">▤ Dashboard</a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-mutedfg hover:bg-[hsl(var(--muted))]">▣ Portfolio</a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-mutedfg hover:bg-[hsl(var(--muted))]">◎ Screener</a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-mutedfg hover:bg-[hsl(var(--muted))]">✦ Ideas</a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-mutedfg hover:bg-[hsl(var(--muted))]">★ Watchlist</a>
+        <a class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-mutedfg hover:bg-[hsl(var(--muted))]">⚙ Settings</a>
+      </nav>
+    </aside>
+
+    <div class="flex min-w-0 flex-1 flex-col">
+      <!-- Topbar -->
+      <header class="sticky top-0 z-10 flex h-16 items-center gap-3 border-b bg-[hsl(var(--bg))]/80 px-4 backdrop-blur">
+        <div class="flex h-9 max-w-sm flex-1 items-center gap-2 rounded-lg border bg-[hsl(var(--muted))]/40 px-3 text-sm text-mutedfg">
+          🔍 <span>Search assets…</span>
+          <kbd class="ml-auto rounded border bg-[hsl(var(--bg))] px-1.5 py-0.5 text-[10px]">⌘K</kbd>
+        </div>
+        <button class="rounded-md border px-3 py-1.5 text-sm">Core Portfolio ▾</button>
+        <button onclick="toggleMode()" class="rounded-md border px-2.5 py-1.5 text-sm" title="Toggle light/dark">◐</button>
+        <div class="flex gap-1">
+          <button onclick="setBrand('default')" class="h-5 w-5 rounded-full ring-2 ring-transparent" style="background:hsl(221 83% 53%)"></button>
+          <button onclick="setBrand('ocean')" class="h-5 w-5 rounded-full ring-2 ring-transparent" style="background:hsl(187 92% 42%)"></button>
+          <button onclick="setBrand('violet')" class="h-5 w-5 rounded-full ring-2 ring-transparent" style="background:hsl(262 83% 58%)"></button>
+        </div>
+        <span class="ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">RA</span>
+      </header>
+
+      <main class="flex-1 overflow-y-auto">
+        <div class="mx-auto max-w-[1400px] space-y-6 p-6">
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p class="text-sm text-mutedfg">Core Portfolio · command center</p>
+          </div>
+
+          <!-- KPI cards -->
+          <div class="grid grid-cols-2 gap-4 lg:grid-cols-4" id="kpis"></div>
+
+          <!-- Performance + Snowflake -->
+          <div class="grid gap-6 lg:grid-cols-3">
+            <div class="rounded-xl border bg-card p-5 lg:col-span-2">
+              <div class="mb-1 flex items-center justify-between">
+                <h2 class="font-semibold">Performance</h2>
+                <div class="rounded-lg bg-[hsl(var(--muted))] p-0.5 text-xs">
+                  <span class="rounded-md bg-[hsl(var(--bg))] px-2.5 py-1 font-medium shadow-sm">3M</span>
+                  <span class="px-2.5 py-1 text-mutedfg">6M</span>
+                  <span class="px-2.5 py-1 text-mutedfg">1Y</span>
+                </div>
+              </div>
+              <div class="text-sm text-mutedfg"><span class="text-base font-semibold text-fg tnum">$284,910</span> <span class="font-semibold text-bull">+12.4%</span> over 3M</div>
+              <div class="mt-3 h-[240px]"><canvas id="perf"></canvas></div>
+            </div>
+
+            <div class="rounded-xl border bg-card p-5">
+              <div class="mb-2 flex items-center justify-between">
+                <div>
+                  <h2 class="font-semibold">Portfolio Snowflake</h2>
+                  <p class="text-xs text-mutedfg">Weighted across holdings</p>
+                </div>
+                <span class="rounded-full bg-bull/15 px-2.5 py-1 text-xs font-semibold text-bull">72 Strong</span>
+              </div>
+              <div class="mx-auto h-[180px] w-[180px]"><canvas id="snow"></canvas></div>
+              <div id="snowbars" class="mt-3 space-y-2"></div>
+            </div>
+          </div>
+
+          <!-- Holdings + Allocation -->
+          <div class="grid gap-6 lg:grid-cols-3">
+            <div class="rounded-xl border bg-card p-5 lg:col-span-2">
+              <h2 class="mb-3 font-semibold">Top Holdings</h2>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead><tr class="border-b text-xs uppercase tracking-wide text-mutedfg">
+                    <th class="px-2 py-2 text-left font-medium">Asset</th>
+                    <th class="px-2 py-2 text-right font-medium">Price</th>
+                    <th class="px-2 py-2 text-right font-medium">Value</th>
+                    <th class="px-2 py-2 text-right font-medium">P&L</th>
+                    <th class="px-2 py-2 text-right font-medium">Weight</th>
+                  </tr></thead>
+                  <tbody id="holdings"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="rounded-xl border bg-card p-5">
+              <h2 class="mb-2 font-semibold">Allocation</h2>
+              <div class="mx-auto h-[180px] w-[180px]"><canvas id="alloc"></canvas></div>
+              <ul id="alloclegend" class="mt-3 space-y-1.5 text-sm"></ul>
+            </div>
+          </div>
+
+          <!-- Movers + Ideas -->
+          <div class="grid gap-6 lg:grid-cols-2">
+            <div class="rounded-xl border bg-card p-5">
+              <h2 class="mb-3 font-semibold">Market Movers</h2>
+              <div class="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-bull">↑ Top Gainers</div>
+                  <div id="gainers" class="space-y-1"></div>
+                </div>
+                <div>
+                  <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-bear">↓ Top Losers</div>
+                  <div id="losers" class="space-y-1"></div>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-xl border bg-card p-5">
+              <h2 class="mb-3 font-semibold">Investment Ideas</h2>
+              <div id="ideas" class="grid gap-3 sm:grid-cols-2"></div>
+            </div>
+          </div>
+
+          <p class="pb-6 text-center text-xs text-mutedfg">Static preview · mock data · the live app is built with Next.js 15 + React 19 + TypeScript.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ── Mock data ───────────────────────────────────────────────────────────
+    const fmtUSD = (n) => "$" + Math.abs(n).toLocaleString("en-US", { maximumFractionDigits: n < 1 ? 4 : 2 });
+    const compact = (n) => { const a=Math.abs(n); const s=n<0?"-":""; if(a>=1e12)return s+"$"+(a/1e12).toFixed(2)+"T"; if(a>=1e9)return s+"$"+(a/1e9).toFixed(1)+"B"; if(a>=1e6)return s+"$"+(a/1e6).toFixed(1)+"M"; return s+"$"+a.toFixed(0); };
+
+    const kpis = [
+      { label:"Total Value", value:"$284,910", sub:"+$3,142 today", change:"+1.12%", up:true },
+      { label:"Total Return", value:"+38.6%", sub:"$79.4K · IRR +21.3%", up:true },
+      { label:"Unrealized P&L", value:"$61.2K", sub:"Realized $18.2K", up:true },
+      { label:"Dividend / Yield", value:"1.18%", sub:"$3,362 / yr projected", up:true },
+    ];
+    document.getElementById("kpis").innerHTML = kpis.map(k=>`
+      <div class="rounded-xl border bg-card p-5">
+        <div class="text-sm font-medium text-mutedfg">${k.label}</div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span class="text-2xl font-bold tnum">${k.value}</span>
+          ${k.change?`<span class="rounded-md ${k.up?'bg-bull/10 text-bull':'bg-bear/10 text-bear'} px-1.5 py-0.5 text-xs font-semibold">${k.change}</span>`:""}
+        </div>
+        <div class="mt-1 text-xs text-mutedfg tnum">${k.sub}</div>
+      </div>`).join("");
+
+    const holdings = [
+      { s:"NVDA", n:"NVIDIA Corp.", c:"#76b900", price:134.8, value:62400, pl:41200, plpct:194, w:21.9 },
+      { s:"BTC", n:"Bitcoin", c:"#f7931a", price:71250, value:60562, pl:23862, plpct:65, w:21.3 },
+      { s:"AAPL", n:"Apple Inc.", c:"#a3a3a3", price:228.4, value:18272, pl:5216, plpct:40, w:6.4 },
+      { s:"ETH", n:"Ethereum", c:"#627eea", price:3820, value:36290, pl:12740, plpct:54, w:12.8 },
+      { s:"MSFT", n:"Microsoft", c:"#0078d4", price:462.1, value:16173, pl:2103, plpct:15, w:5.7 },
+    ];
+    document.getElementById("holdings").innerHTML = holdings.map(h=>`
+      <tr class="border-b last:border-0 hover:bg-[hsl(var(--muted))]/40">
+        <td class="px-2 py-2.5"><div class="flex items-center gap-3">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg text-[10px] font-bold text-white" style="background:${h.c}">${h.s.slice(0,2)}</span>
+          <div><div class="font-semibold leading-tight">${h.s}</div><div class="text-xs text-mutedfg">${h.n}</div></div>
+        </div></td>
+        <td class="px-2 py-2.5 text-right tnum">${fmtUSD(h.price)}</td>
+        <td class="px-2 py-2.5 text-right font-medium tnum">${compact(h.value)}</td>
+        <td class="px-2 py-2.5 text-right"><div class="font-medium text-bull tnum">${compact(h.pl)}</div><div class="text-xs text-bull tnum">+${h.plpct}%</div></td>
+        <td class="px-2 py-2.5 text-right"><div class="flex items-center justify-end gap-2"><div class="hidden h-1.5 w-12 overflow-hidden rounded-full bg-[hsl(var(--muted))] md:block"><div class="h-full rounded-full bg-primary" style="width:${h.w}%"></div></div><span class="text-mutedfg tnum">${h.w}%</span></div></td>
+      </tr>`).join("");
+
+    const movers = {
+      gainers:[["PLTR","#101113","+3.8%"],["RENDER","#ff5b34","+5.6%"],["SOL","#14f195","+4.3%"],["NVDA","#76b900","+2.95%"]],
+      losers:[["TSLA","#e82127","-2.1%"],["POL","#8247e5","-2.4%"],["UNI","#ff007a","-1.2%"],["AMZN","#ff9900","-0.64%"]],
+    };
+    const moverRow=([s,c,ch],up)=>`<div class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-[hsl(var(--muted))]/40">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg text-[10px] font-bold text-white" style="background:${c}">${s.slice(0,2)}</span>
+      <div class="flex-1 text-sm font-semibold">${s}</div>
+      <span class="rounded-md ${up?'bg-bull/10 text-bull':'bg-bear/10 text-bear'} px-1.5 py-0.5 text-xs font-semibold">${ch}</span></div>`;
+    document.getElementById("gainers").innerHTML = movers.gainers.map(m=>moverRow(m,true)).join("");
+    document.getElementById("losers").innerHTML = movers.losers.map(m=>moverRow(m,false)).join("");
+
+    const ideas=[["AI Leaders","NVDA · MSFT · PLTR","from-violet-500/20 to-blue-500/20"],["High Dividend","JNJ · JPM · V","from-amber-500/20 to-emerald-500/20"],["Layer 1s","ETH · SOL · BNB","from-cyan-500/20 to-indigo-500/20"],["DeFi","UNI · LINK · ARB","from-pink-500/20 to-purple-500/20"]];
+    document.getElementById("ideas").innerHTML = ideas.map(([t,sym,grad])=>`
+      <div class="relative overflow-hidden rounded-xl border p-4">
+        <div class="absolute inset-0 bg-gradient-to-br ${grad} opacity-60"></div>
+        <div class="relative"><div class="font-semibold">${t}</div><div class="mt-1 text-xs text-mutedfg">${sym}</div></div>
+      </div>`).join("");
+
+    const snowAxes=[["Value",3.1],["Growth",4.2],["Past",4.0],["Health",4.4],["Income",1.8]];
+    const axisColors=["#0ea5e9","#22c55e","#a855f7","#3b82f6","#f59e0b"];
+    document.getElementById("snowbars").innerHTML = snowAxes.map(([a,v],i)=>`
+      <div class="flex items-center gap-3"><span class="w-14 text-xs font-medium text-mutedfg">${a}</span>
+      <div class="h-2 flex-1 overflow-hidden rounded-full bg-[hsl(var(--muted))]"><div class="h-full rounded-full" style="width:${v/5*100}%;background:${axisColors[i]}"></div></div>
+      <span class="w-7 text-right text-xs font-semibold tnum">${v.toFixed(1)}</span></div>`).join("");
+
+    const allocData=[["Stocks",58,"#3b82f6"],["Crypto",42,"#f59e0b"]];
+    document.getElementById("alloclegend").innerHTML = allocData.map(([l,p,c])=>`
+      <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full" style="background:${c}"></span>${l}<span class="ml-auto font-medium tnum">${p}%</span></li>`).join("");
+
+    // ── Charts ──────────────────────────────────────────────────────────────
+    const cssv = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const hsl = (n) => `hsl(${cssv(n)})`;
+    let charts=[];
+    function buildCharts(){
+      charts.forEach(c=>c.destroy()); charts=[];
+      const grid="hsl("+cssv("--border")+")", mut="hsl("+cssv("--muted-fg")+")";
+      // Performance line
+      const days=Array.from({length:40},(_,i)=>i);
+      let v=240000; const series=days.map(()=>{v+=(Math.sin(v/9000)+ (Math.random()-0.45))*2600; return Math.round(v);});
+      const pctx=document.getElementById("perf").getContext("2d");
+      const grad=pctx.createLinearGradient(0,0,0,240); grad.addColorStop(0,"hsl("+cssv("--bull")+" / 0.35)"); grad.addColorStop(1,"hsl("+cssv("--bull")+" / 0)");
+      charts.push(new Chart(pctx,{type:"line",data:{labels:days,datasets:[{data:series,borderColor:"hsl("+cssv("--bull")+")",backgroundColor:grad,fill:true,tension:.35,pointRadius:0,borderWidth:2}]},options:{plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:mut,callback:v=>compact(v)},grid:{color:grid}}},maintainAspectRatio:false}}));
+      // Snowflake radar
+      charts.push(new Chart(document.getElementById("snow"),{type:"radar",data:{labels:snowAxes.map(a=>a[0]),datasets:[{data:snowAxes.map(a=>a[1]),borderColor:hsl("--primary"),backgroundColor:"hsl("+cssv("--primary")+" / 0.3)",borderWidth:2,pointRadius:0}]},options:{plugins:{legend:{display:false}},scales:{r:{min:0,max:5,angleLines:{color:grid},grid:{color:grid},pointLabels:{color:mut,font:{size:11,weight:"600"}},ticks:{display:false}}},maintainAspectRatio:false}}));
+      // Allocation doughnut
+      charts.push(new Chart(document.getElementById("alloc"),{type:"doughnut",data:{labels:allocData.map(a=>a[0]),datasets:[{data:allocData.map(a=>a[1]),backgroundColor:allocData.map(a=>a[2]),borderColor:hsl("--card"),borderWidth:2}]},options:{cutout:"66%",plugins:{legend:{display:false}},maintainAspectRatio:false}}));
+    }
+    buildCharts();
+
+    // ── Theme controls ──────────────────────────────────────────────────────
+    function toggleMode(){ document.documentElement.classList.toggle("dark"); buildCharts(); }
+    function setBrand(b){ document.documentElement.setAttribute("data-brand",b); buildCharts(); }
+  </script>
+</body>
+</html>

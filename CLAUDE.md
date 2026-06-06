@@ -103,6 +103,9 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add standalone HTML preview** (`preview/strata-preview.html`): a build-free,
+  single-file mock of the dashboard (CDN Tailwind + Chart.js, inline mock data) with
+  working light/dark + brand-theme toggles, for quickly showing the UI without `npm`.
 - **Add component tests + Playwright E2E**: 5 jsdom component tests (ScorePill, ChangeBadge,
   MetricCard, SnowflakeBreakdown) via Testing Library (Vitest now has `@vitejs/plugin-react`
   + jsdom setup, 17 tests total); Playwright config + `e2e/smoke.spec.ts` covering the main

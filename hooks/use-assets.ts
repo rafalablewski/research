@@ -50,12 +50,13 @@ export function useAsset(symbol: string) {
   const base = getAssetBySymbol(symbol);
   return useQuery<Asset | undefined>({
     queryKey: ["asset", symbol.toUpperCase()],
-    // Crypto fetches live CoinGecko quotes via our route handler (with built-in
-    // mock fallback); stocks resolve from mock until a stock provider is wired.
+    // Crypto → CoinGecko, stocks → FMP, both via route handlers with built-in
+    // mock fallback. Returns the curated mock asset if anything goes wrong.
     queryFn: async () => {
-      if (base?.assetClass === "crypto") {
+      if (base) {
+        const endpoint = base.assetClass === "crypto" ? "crypto" : "stocks";
         try {
-          const res = await fetch(`/api/crypto/${symbol}`);
+          const res = await fetch(`/api/${endpoint}/${symbol}`);
           if (res.ok) {
             const json = (await res.json()) as { asset: Asset };
             return json.asset;
@@ -83,6 +84,32 @@ export function useCryptoMarkets() {
       if (!res.ok) throw new Error("crypto markets request failed");
       return res.json();
     },
+    staleTime: 60_000,
+  });
+}
+
+/**
+ * The full live market universe (stocks + crypto) for lists/screeners.
+ *
+ * Renders instantly from mock `initialData`, then swaps in live quotes as the
+ * provider routes resolve. `isLive` is true once any provider returned live data.
+ */
+export function useMarketAssets() {
+  return useQuery<{ assets: Asset[]; isLive: boolean }>({
+    queryKey: ["market", "all"],
+    queryFn: async () => {
+      const [stocksRes, cryptoRes] = await Promise.allSettled([
+        fetch("/api/stocks").then((r) => r.json()),
+        fetch("/api/crypto").then((r) => r.json()),
+      ]);
+      const stocks = stocksRes.status === "fulfilled" ? stocksRes.value : { source: "mock", assets: STOCKS };
+      const crypto = cryptoRes.status === "fulfilled" ? cryptoRes.value : { source: "mock", assets: CRYPTOS };
+      return {
+        assets: [...stocks.assets, ...crypto.assets],
+        isLive: stocks.source !== "mock" || crypto.source !== "mock",
+      };
+    },
+    initialData: { assets: ALL_ASSETS, isLive: false },
     staleTime: 60_000,
   });
 }

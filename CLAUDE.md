@@ -66,8 +66,9 @@ There is **no test suite** configured yet. `npm run typecheck` is the closest ga
 | --- | --- |
 | App (dashboard, portfolio, screener, ideas, watchlist, asset pages) | ✅ built |
 | Crypto live provider (CoinGecko) | ✅ wired, mock fallback |
-| Stock live provider | ⛔ not wired (mock only) |
-| Live data surfaced in screener/movers/watchlist lists | ⛔ static mock (asset detail page is live) |
+| Stock live provider (FMP) | ✅ wired (needs `FMP_API_KEY`), mock fallback |
+| Live data in screener | ✅ via `useMarketAssets` (shows a "Live" badge) |
+| Live data in dashboard movers / watchlist lists | ⛔ still static mock |
 | Tests | ⛔ none configured |
 
 ## Enforcement (optional)
@@ -84,6 +85,12 @@ Not installed yet — ask the user before adding.
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Wire FMP live stock provider** (`lib/api/fmp.ts`, `app/api/stocks[/:symbol]`),
+  symmetric to CoinGecko; needs `FMP_API_KEY`, mock fallback. `useAsset` now routes
+  stocks→FMP and crypto→CoinGecko. Generalized the live badge to show the provider.
+- **Add `useMarketAssets`** (merges live stocks + crypto) and wire the **screener** to
+  it — live quotes now flow into the screener with a "Live" indicator. `Asset.dataSource`
+  extended to include `"fmp"`.
 - **Add CLAUDE.md** with project guide, conventions, operating notes (network allowlist,
   SessionStart hook), status table, and the Changelog-discipline rule.
 - **Wire CoinGecko live crypto provider** (`lib/api/coingecko.ts`, `app/api/crypto[/:symbol]`):

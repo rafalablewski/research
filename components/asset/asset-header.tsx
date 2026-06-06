@@ -42,9 +42,9 @@ export function AssetHeader({ asset, onAddTransaction }: { asset: Asset; onAddTr
               <Badge variant="outline" className="hidden sm:inline-flex">
                 {asset.assetClass === "stock" ? asset.exchange : asset.sector}
               </Badge>
-              {asset.dataSource === "coingecko" && (
+              {asset.dataSource && asset.dataSource !== "mock" && (
                 <Badge variant="bull" className="gap-1">
-                  <Radio className="h-3 w-3" /> Live · CoinGecko
+                  <Radio className="h-3 w-3" /> Live · {asset.dataSource === "coingecko" ? "CoinGecko" : "FMP"}
                 </Badge>
               )}
             </div>

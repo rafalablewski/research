@@ -11,9 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ALL_ASSETS, INVESTMENT_IDEAS } from "@/data";
+import { INVESTMENT_IDEAS } from "@/data";
+import { useMarketAssets } from "@/hooks/use-assets";
 import { overallScore } from "@/lib/snowflake";
 import { cn } from "@/lib/utils";
+import { Radio } from "lucide-react";
 
 type ClassFilter = "all" | "stock" | "crypto";
 
@@ -29,14 +31,18 @@ function ScreenerInner() {
   const [minYield, setMinYield] = useState(0);
   const [positiveOnly, setPositiveOnly] = useState(false);
 
+  // Live universe (stocks + crypto) with instant mock initialData.
+  const { data: market } = useMarketAssets();
+  const universe = market.assets;
+
   const sectors = useMemo(
-    () => Array.from(new Set(ALL_ASSETS.map((a) => a.sector).filter(Boolean))) as string[],
-    [],
+    () => Array.from(new Set(universe.map((a) => a.sector).filter(Boolean))) as string[],
+    [universe],
   );
 
   const filtered = useMemo(() => {
     const ideaSymbols = idea ? new Set(idea.symbols) : null;
-    return ALL_ASSETS.filter((a) => {
+    return universe.filter((a) => {
       if (ideaSymbols && !ideaSymbols.has(a.symbol)) return false;
       if (klass !== "all" && a.assetClass !== klass) return false;
       if (sector !== "all" && a.sector !== sector) return false;
@@ -49,7 +55,7 @@ function ScreenerInner() {
       }
       return true;
     });
-  }, [idea, klass, sector, minScore, minYield, positiveOnly, query]);
+  }, [universe, idea, klass, sector, minScore, minYield, positiveOnly, query]);
 
   const reset = () => {
     setKlass("all");
@@ -66,9 +72,16 @@ function ScreenerInner() {
         title="Screener"
         subtitle="Filter and rank the entire stock + crypto universe."
         actions={
-          <Button variant="ghost" size="sm" onClick={reset}>
-            <X className="h-4 w-4" /> Reset
-          </Button>
+          <>
+            {market.isLive && (
+              <Badge variant="bull" className="gap-1">
+                <Radio className="h-3 w-3" /> Live
+              </Badge>
+            )}
+            <Button variant="ghost" size="sm" onClick={reset}>
+              <X className="h-4 w-4" /> Reset
+            </Button>
+          </>
         }
       />
 

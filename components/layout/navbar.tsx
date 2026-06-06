@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Menu, User, Settings, LogOut, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -63,7 +64,9 @@ export function Navbar() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem><User className="h-4 w-4" /> Profile</DropdownMenuItem>
-            <DropdownMenuItem><Settings className="h-4 w-4" /> Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings"><Settings className="h-4 w-4" /> Settings</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem><LifeBuoy className="h-4 w-4" /> Support</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem><LogOut className="h-4 w-4" /> Sign out</DropdownMenuItem>

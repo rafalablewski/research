@@ -8,6 +8,7 @@ import {
   Telescope,
   Star,
   Lightbulb,
+  Settings,
   PanelLeftClose,
   PanelLeftOpen,
   Layers,
@@ -23,6 +24,7 @@ const NAV = [
   { href: "/screener", label: "Screener", icon: Telescope },
   { href: "/ideas", label: "Ideas", icon: Lightbulb },
   { href: "/watchlist", label: "Watchlist", icon: Star },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 /** Collapsible desktop sidebar. On mobile it lives inside a Sheet (see Navbar). */

@@ -98,6 +98,10 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add Settings page** (`/settings`): appearance (mode + brand swatches), display-currency
+  preference (`ui-store.currency`, FX conversion documented as a seam), and a live
+  **Data Source Status** panel that probes `/api/stocks` + `/api/crypto` and reports
+  live/mock per provider. Linked from the sidebar and user menu.
 - **Live OHLC history for charts**: `fetchCryptoHistory` (CoinGecko market_chart,
   synthesized candles) and `fetchStockHistory` (FMP historical-price-full, true OHLC).
   Single-asset routes now return live `history` for the price/candlestick/comparison

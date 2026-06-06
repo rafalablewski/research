@@ -103,6 +103,10 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add GitHub Actions CI** (`.github/workflows/ci.yml`): on push/PR runs `npm ci` then
+  typecheck → lint → test → build on Node 22 (npm cache, concurrency-cancel). E2E omitted
+  (needs Playwright browsers). NOTE: `npm ci` warns `next@15.1.3` has CVE-2025-66478 —
+  bump to a patched 15.x when convenient.
 - **Wire FX display-currency conversion** (`lib/api/fx.ts`, `app/api/fx`, `hooks/use-fx.ts`):
   `useMoney()` converts USD→selected currency (live rates via open.er-api.com, static
   fallback) and is wired into the dashboard overview cards, holdings table and asset

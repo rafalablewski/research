@@ -103,6 +103,9 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Fix HTML preview styling**: rewrote `preview/strata-preview.html` to be fully
+  self-contained — hand-written inline CSS (no Tailwind Play CDN) and inline **SVG** charts
+  (no Chart.js CDN), so it renders correctly offline / via `file://`. Verified with jsdom.
 - **Security: bump Next.js 15.1.3 → 15.5.19** (+ `eslint-config-next` to match) to patch
   CVE-2025-66478. Typecheck, lint, 17 tests and build all pass; `npm ci` clean. (`next lint`
   now prints a deprecation notice — works fine; migrate to the ESLint CLI before Next 16.)

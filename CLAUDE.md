@@ -103,6 +103,9 @@ commits made outside Claude too. Activate it with `git config core.hooksPath .gi
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Security: bump Next.js 15.1.3 → 15.5.19** (+ `eslint-config-next` to match) to patch
+  CVE-2025-66478. Typecheck, lint, 17 tests and build all pass; `npm ci` clean. (`next lint`
+  now prints a deprecation notice — works fine; migrate to the ESLint CLI before Next 16.)
 - **Add GitHub Actions CI** (`.github/workflows/ci.yml`): on push/PR runs `npm ci` then
   typecheck → lint → test → build on Node 22 (npm cache, concurrency-cancel). E2E omitted
   (needs Playwright browsers). NOTE: `npm ci` warns `next@15.1.3` has CVE-2025-66478 —

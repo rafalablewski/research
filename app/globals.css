@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Strata theme system
+ * ───────────────────────────────────────────────────────────────────────────
+ * Every colour is a CSS variable expressed as raw HSL channels (e.g. "222 47% 11%")
+ * so Tailwind can wrap them with `hsl(var(--token) / <alpha>)`.
+ *
+ * Themes are layered:
+ *   :root                  → light (default)
+ *   .dark                  → dark mode (toggled via next-themes `class` attribute)
+ *   [data-theme="ocean"]   → custom brand theme (light variant)
+ *   .dark[data-theme="ocean"] → custom brand theme (dark variant)
+ *
+ * To ADD A NEW THEME: copy a `[data-theme="..."]` block, retune the tokens, then
+ * register the theme's id/label in `lib/themes.ts`. Nothing else needs to change.
+ */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+
+    --bull: 142 71% 45%;
+    --bear: 0 72% 51%;
+
+    --score-value: 199 89% 48%;
+    --score-growth: 142 71% 45%;
+    --score-past: 262 83% 58%;
+    --score-health: 221 83% 53%;
+    --score-dividend: 38 92% 50%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 44% 10%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 44% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
+
+    --bull: 142 69% 50%;
+    --bear: 0 72% 60%;
+
+    --score-value: 199 89% 55%;
+    --score-growth: 142 69% 50%;
+    --score-past: 262 83% 68%;
+    --score-health: 217 91% 60%;
+    --score-dividend: 38 92% 58%;
+  }
+
+  /* ── Custom brand theme: "Ocean" (teal/cyan) ──────────────────────────── */
+  [data-theme="ocean"] {
+    --primary: 187 92% 38%;
+    --ring: 187 92% 38%;
+    --score-health: 187 92% 38%;
+  }
+  .dark[data-theme="ocean"] {
+    --background: 200 60% 6%;
+    --card: 200 50% 9%;
+    --popover: 200 50% 9%;
+    --primary: 186 86% 52%;
+    --ring: 186 86% 52%;
+    --secondary: 200 40% 15%;
+    --accent: 200 40% 15%;
+    --muted: 200 40% 13%;
+    --border: 200 40% 16%;
+  }
+
+  /* ── Custom brand theme: "Violet" (royal purple) ──────────────────────── */
+  [data-theme="violet"] {
+    --primary: 262 83% 58%;
+    --ring: 262 83% 58%;
+    --score-health: 262 83% 58%;
+  }
+  .dark[data-theme="violet"] {
+    --background: 263 40% 7%;
+    --card: 263 35% 11%;
+    --popover: 263 35% 11%;
+    --primary: 263 90% 66%;
+    --ring: 263 90% 66%;
+    --secondary: 263 30% 18%;
+    --accent: 263 30% 18%;
+    --muted: 263 30% 15%;
+    --border: 263 30% 19%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;
+  }
+}
+
+@layer utilities {
+  /* Numbers should align in tables/metrics. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Subtle scrollbar that respects the theme. */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+}

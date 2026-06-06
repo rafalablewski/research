@@ -11,6 +11,9 @@ fi
 
 cd "$CLAUDE_PROJECT_DIR"
 
+# Activate the tracked git hooks (changelog pre-commit) for this clone.
+git config core.hooksPath .githooks 2>/dev/null || true
+
 # Idempotent: npm install is a no-op when node_modules is already in sync,
 # and benefits from the container's post-hook state caching.
 echo "[session-start] Installing npm dependencies..."

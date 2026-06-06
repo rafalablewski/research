@@ -86,8 +86,10 @@ The Changelog rule is **self-enforcing** via a Claude `PreToolUse` hook
 non-commit Bash commands, (b) block commits missing `CLAUDE.md` (exit 2), (c) allow when
 `CLAUDE.md` is staged or nothing is staged.
 
-Not yet added (optional): a **git-native** `pre-commit` hook to also cover commits made
-outside Claude sessions.
+**Also installed:** a **git-native** `pre-commit` hook (`.githooks/pre-commit`) that covers
+commits made outside Claude too. Activate it with `git config core.hooksPath .githooks`
+(the SessionStart hook does this automatically in web sessions). Bypass intentionally with
+`git commit --no-verify`.
 
 ---
 
@@ -96,6 +98,9 @@ outside Claude sessions.
 _Newest first. Update with every commit (see rule at top)._
 
 ### 2026-06-06
+- **Add git-native `pre-commit` hook** (`.githooks/pre-commit`) enforcing the changelog
+  rule for all commits (not just Claude's). SessionStart hook now runs
+  `git config core.hooksPath .githooks` to auto-activate it in web sessions.
 - **Add multi-asset performance comparison chart** (`components/charts/comparison-chart.tsx`)
   on the asset Charts tab: rebases each series to 0% over a selectable range and lets the
   user toggle peer assets (sourced from `useSimilarAssets`) to compare relative returns.
